@@ -140,12 +140,12 @@
 </tbody></table>
 <p>抓包方法要点：电脑开热点让手机流量必经抓包网卡；发送图片后停止抓包并保存 pcapng。</p>
 <h2 id="三、分析过程"><a href="#三、分析过程" class="headerlink" title="三、分析过程"></a>三、分析过程</h2><h3 id="3-1-协议统计：只有-TCP，没有-UDP"><a href="#3-1-协议统计：只有-TCP，没有-UDP" class="headerlink" title="3.1 协议统计：只有 TCP，没有 UDP"></a>3.1 协议统计：只有 TCP，没有 UDP</h3><p>菜单”统计 → 协议分级（Protocol Hierarchy）”显示，本次捕获的 QQ 相关流量<strong>全部是 TCP</strong>，其上层<strong>全部是 TLS</strong>，没有任何 UDP 流量。</p>
-<p><img src="/images/tu1_xieyi.png" alt="图1 协议分级：仅TCP&#x2F;TLS，无UDP"></p>
+<p><img src="/img/tu1_xieyi.png" alt="图1 协议分级：仅TCP&#x2F;TLS，无UDP"></p>
 <blockquote>
 <p>结论 1：新版 QQ 在本场景下仅使用 <strong>TCP</strong>，不使用 UDP。</p>
 </blockquote>
 <h3 id="3-2-定位图片传输流"><a href="#3-2-定位图片传输流" class="headerlink" title="3.2 定位图片传输流"></a>3.2 定位图片传输流</h3><p>发送图片的瞬间，捕获中出现一条约 <strong>881 KB</strong> 的 TCP 流（图片本身 627 KB，密文+协议开销后略大），用显示过滤器 <code>tcp.stream eq 4</code> 单独查看：</p>
-<p><img src="/images/tu2_stream.png" alt="图2 图片传输流：TLSv1.2、443端口、经服务器中转"></p>
+<p><img src="/img/tu2_stream.png" alt="图2 图片传输流：TLSv1.2、443端口、经服务器中转"></p>
 <p>图中可见：</p>
 <ul>
 <li>对端 IP 为腾讯服务器（14.22.20.217），<strong>不是</strong>手机与电脑之间的直连；</li>
@@ -197,7 +197,7 @@
 </ul>
 <p><strong>（3）TLS 记录结构验证</strong></p>
 <p>对全文搜索 TLS 记录头（类型 ∈ {14,15,16,17,18} + 版本 0x03xx + 合法长度），随机数据的期望仅 0.3 个，<strong>实际找到 33 个候选</strong>；其中从偏移 614528 起有 <strong>25 条 <code>17 03 03</code> 类型的应用数据记录</strong>严丝合缝地连续贯穿到流结尾。这是标准 TLS 记录层（0x17 &#x3D; Application Data，0303 &#x3D; TLS 1.2 记录版本）。</p>
-<p><img src="/images/tu3_luanma.png" alt="图3 追踪TCP流：内容为不可读密文"></p>
+<p><img src="/img/tu3_luanma.png" alt="图3 追踪TCP流：内容为不可读密文"></p>
 <blockquote>
 <p>结论 3：图片数据被 <strong>TLS 1.2 加密</strong>，整条流无明文特征。</p>
 </blockquote>
@@ -245,7 +245,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/10/19/Wireshark-qq-capture/" data-id="cuid8MeeR6-BgMHSG3a90bzHq" data-title="QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/10/19/Wireshark-qq-capture/" data-id="cuiddre1Y8UqLf2Una17TwZJ8" data-title="QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -312,7 +312,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/09/28/post%E5%AF%B9%E4%BA%8E%E7%AD%89%E4%BF%9D2-0%E7%9A%84%E7%90%86%E8%A7%A3%E4%BD%9C%E4%B8%9A/" data-id="cuidXcOe3jBGjtSZ7G4JDEhUS" data-title="对于等保2.0的理解" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/09/28/post%E5%AF%B9%E4%BA%8E%E7%AD%89%E4%BF%9D2-0%E7%9A%84%E7%90%86%E8%A7%A3%E4%BD%9C%E4%B8%9A/" data-id="cuidZ5xP1G7OeCECKehLBwf0v" data-title="对于等保2.0的理解" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -365,7 +365,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/09/22/hello-world/" data-id="cuidrCptS71q6c0PHZ023-ggC" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/09/22/hello-world/" data-id="cuid9r5dMSglMGlF0mr_a0OJ5" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       

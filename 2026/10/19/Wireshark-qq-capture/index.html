@@ -13,18 +13,18 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="课程作业：QQ 流量分析（PC-PC 端、PC-手机端）本文实验覆盖 PC-手机 场景（手机 QQ ↔ 电脑 QQ 互发图片）  一、实验要回答的四个问题 QQ 传输用 UDP 还是 TCP？ 传输内容是加密还是明文？ 如果是明文传输，能否利用文件头特征码从流量中恢复原文件？在线传输方式下文件数据长什么样？ 图片在两端之间是直连（P2P）还是经服务器中转？  二、实验环境   项目 说明">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/tu1_xieyi.png">
-<meta property="og:image" content="http://example.com/images/tu2_stream.png">
-<meta property="og:image" content="http://example.com/images/tu3_luanma.png">
+<meta property="og:image" content="http://example.com/img/tu1_xieyi.png">
+<meta property="og:image" content="http://example.com/img/tu2_stream.png">
+<meta property="og:image" content="http://example.com/img/tu3_luanma.png">
 <meta property="article:published_time" content="2026-10-19T02:30:00.000Z">
-<meta property="article:modified_time" content="2026-10-19T02:50:21.813Z">
+<meta property="article:modified_time" content="2026-10-19T03:17:42.782Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="QQ">
 <meta property="article:tag" content="Wireshark">
 <meta property="article:tag" content="抓包分析">
 <meta property="article:tag" content="网络安全">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/tu1_xieyi.png">
+<meta name="twitter:image" content="http://example.com/img/tu1_xieyi.png">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,12 +150,12 @@
 </tbody></table>
 <p>抓包方法要点：电脑开热点让手机流量必经抓包网卡；发送图片后停止抓包并保存 pcapng。</p>
 <h2 id="三、分析过程"><a href="#三、分析过程" class="headerlink" title="三、分析过程"></a>三、分析过程</h2><h3 id="3-1-协议统计：只有-TCP，没有-UDP"><a href="#3-1-协议统计：只有-TCP，没有-UDP" class="headerlink" title="3.1 协议统计：只有 TCP，没有 UDP"></a>3.1 协议统计：只有 TCP，没有 UDP</h3><p>菜单”统计 → 协议分级（Protocol Hierarchy）”显示，本次捕获的 QQ 相关流量<strong>全部是 TCP</strong>，其上层<strong>全部是 TLS</strong>，没有任何 UDP 流量。</p>
-<p><img src="/images/tu1_xieyi.png" alt="图1 协议分级：仅TCP&#x2F;TLS，无UDP"></p>
+<p><img src="/img/tu1_xieyi.png" alt="图1 协议分级：仅TCP&#x2F;TLS，无UDP"></p>
 <blockquote>
 <p>结论 1：新版 QQ 在本场景下仅使用 <strong>TCP</strong>，不使用 UDP。</p>
 </blockquote>
 <h3 id="3-2-定位图片传输流"><a href="#3-2-定位图片传输流" class="headerlink" title="3.2 定位图片传输流"></a>3.2 定位图片传输流</h3><p>发送图片的瞬间，捕获中出现一条约 <strong>881 KB</strong> 的 TCP 流（图片本身 627 KB，密文+协议开销后略大），用显示过滤器 <code>tcp.stream eq 4</code> 单独查看：</p>
-<p><img src="/images/tu2_stream.png" alt="图2 图片传输流：TLSv1.2、443端口、经服务器中转"></p>
+<p><img src="/img/tu2_stream.png" alt="图2 图片传输流：TLSv1.2、443端口、经服务器中转"></p>
 <p>图中可见：</p>
 <ul>
 <li>对端 IP 为腾讯服务器（14.22.20.217），<strong>不是</strong>手机与电脑之间的直连；</li>
@@ -207,7 +207,7 @@
 </ul>
 <p><strong>（3）TLS 记录结构验证</strong></p>
 <p>对全文搜索 TLS 记录头（类型 ∈ {14,15,16,17,18} + 版本 0x03xx + 合法长度），随机数据的期望仅 0.3 个，<strong>实际找到 33 个候选</strong>；其中从偏移 614528 起有 <strong>25 条 <code>17 03 03</code> 类型的应用数据记录</strong>严丝合缝地连续贯穿到流结尾。这是标准 TLS 记录层（0x17 &#x3D; Application Data，0303 &#x3D; TLS 1.2 记录版本）。</p>
-<p><img src="/images/tu3_luanma.png" alt="图3 追踪TCP流：内容为不可读密文"></p>
+<p><img src="/img/tu3_luanma.png" alt="图3 追踪TCP流：内容为不可读密文"></p>
 <blockquote>
 <p>结论 3：图片数据被 <strong>TLS 1.2 加密</strong>，整条流无明文特征。</p>
 </blockquote>
@@ -255,7 +255,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/10/19/Wireshark-qq-capture/" data-id="cuid8MeeR6-BgMHSG3a90bzHq" data-title="QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/10/19/Wireshark-qq-capture/" data-id="cuiddre1Y8UqLf2Una17TwZJ8" data-title="QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
