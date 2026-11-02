@@ -111,7 +111,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/11/02/curl%E5%91%BD%E4%BB%A4%E5%AE%9E%E9%AA%8C/" data-id="cuidxy_0hLAh-DC2k3YOp6gNL" data-title="curl命令体验实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/11/02/curl%E5%91%BD%E4%BB%A4%E5%AE%9E%E9%AA%8C/" data-id="cuid_5uougrcSIOaqsnh_0nA3" data-title="curl命令体验实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -251,11 +251,77 @@ except Exception:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/11/02/%E7%AC%91%E8%84%B8%E5%AE%9E%E9%AA%8C/" data-id="cuid29XCd6HjCZ9v2ZrfZgzXt" data-title="vsftpd 笑脸漏洞检测PoC（Python）实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/11/02/%E7%AC%91%E8%84%B8%E5%AE%9E%E9%AA%8C/" data-id="cuidwwbcsVafT2kkOqzyg5Hx9" data-title="vsftpd 笑脸漏洞检测PoC（Python）实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/PoC/" rel="tag">PoC</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vsftpd/" rel="tag">vsftpd</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%90%8E%E9%97%A8/" rel="tag">后门</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-pikachu靶场搭建实验" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/11/02/pikachu%E9%9D%B6%E5%9C%BA%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C/" class="article-date">
+  <time class="dt-published" datetime="2026-11-02T07:00:00.000Z" itemprop="datePublished">2026-11-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Web%E5%AE%89%E5%85%A8/">Web安全</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2026/11/02/pikachu%E9%9D%B6%E5%9C%BA%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C/">Pikachu靶场搭建实验</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="Pikachu靶场搭建实验"><a href="#Pikachu靶场搭建实验" class="headerlink" title="Pikachu靶场搭建实验"></a>Pikachu靶场搭建实验</h1><h2 id="一、实验介绍"><a href="#一、实验介绍" class="headerlink" title="一、实验介绍"></a>一、实验介绍</h2><p>Pikachu（皮卡丘）是面向Web安全初学者的中文漏洞练习平台，源码托管在GitHub。平台内置暴力破解、XSS、SQL注入、文件上传、CSRF、RCE等常见Web漏洞场景，适合在本地可控环境练习渗透测试，学习漏洞原理、利用方式以及修复方案。</p>
+<h2 id="二、实验环境"><a href="#二、实验环境" class="headerlink" title="二、实验环境"></a>二、实验环境</h2><ul>
+<li>操作系统：Windows</li>
+<li>Web环境：phpStudy（小皮面板）Apache + MySQL + PHP</li>
+<li>靶场地址：<code>http://127.0.0.1/pikachu/index.php</code></li>
+</ul>
+<h2 id="三、搭建步骤"><a href="#三、搭建步骤" class="headerlink" title="三、搭建步骤"></a>三、搭建步骤</h2><ol>
+<li>下载Pikachu源码，解压，将源码文件放到 <code>phpstudy_pro/WWW/pikachu</code> 目录下，<strong>不要嵌套多余文件夹</strong>，否则访问404。</li>
+<li>打开小皮面板，启动 Apache 和 MySQL 服务。</li>
+<li>修改配置文件 <code>inc/config.inc.php</code>，填写数据库连接信息：</li>
+</ol>
+<pre><code class="language-php">&lt;?php
+session_start();
+date_default_timezone_set(&#39;Asia/Shanghai&#39;);
+header(&#39;Content-type:text/html;charset=utf-8&#39;);
+define(&#39;DBHOST&#39;, &#39;127.0.0.1&#39;);
+define(&#39;DBUSER&#39;, &#39;root&#39;);
+define(&#39;DBPW&#39;,&#39;root&#39;);
+define(&#39;DBNAME&#39;, &#39;pikachu&#39;);
+define(&#39;DBPORT&#39;, &#39;3306&#39;);
+?&gt;
+</code></pre>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/11/02/pikachu%E9%9D%B6%E5%9C%BA%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C/" data-id="cuidPSIuXnObAQ2KN5ZqMVobm" data-title="Pikachu靶场搭建实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Pikachu/" rel="tag">Pikachu</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web%E6%BC%8F%E6%B4%9E/" rel="tag">Web漏洞</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" rel="tag">渗透测试</a></li></ul>
 
     </footer>
   </div>
@@ -439,7 +505,7 @@ except Exception:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/10/19/Wireshark-qq-capture/" data-id="cuid59174DIaJGVWF0mhrW3DF" data-title="QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/10/19/Wireshark-qq-capture/" data-id="cuidCzPZRp8UqkD7Sx7gxTqlu" data-title="QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -506,7 +572,7 @@ except Exception:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/09/28/post%E5%AF%B9%E4%BA%8E%E7%AD%89%E4%BF%9D2-0%E7%9A%84%E7%90%86%E8%A7%A3%E4%BD%9C%E4%B8%9A/" data-id="cuidmGtpudlDw9cdI47jX0qAq" data-title="对于等保2.0的理解" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/09/28/post%E5%AF%B9%E4%BA%8E%E7%AD%89%E4%BF%9D2-0%E7%9A%84%E7%90%86%E8%A7%A3%E4%BD%9C%E4%B8%9A/" data-id="cuidnig3Qf2bDJFK5pNp7oxZV" data-title="对于等保2.0的理解" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -559,7 +625,7 @@ except Exception:
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2026/09/22/hello-world/" data-id="cuidXuFbc2qA1bM7fnIo31KWB" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
+      <a data-url="http://example.com/2026/09/22/hello-world/" data-id="cuidbxEMsLHdEmlqb4exiRL2I" data-title="Hello World" class="article-share-link"><span class="fa fa-share">分享</span></a>
       
       
       
@@ -581,7 +647,7 @@ except Exception:
   <div class="widget-wrap">
     <h3 class="widget-title">分类</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Web%E5%AE%89%E5%85%A8/">Web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a></li></ul>
     </div>
   </div>
 
@@ -591,7 +657,7 @@ except Exception:
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/API%E8%B0%83%E8%AF%95/" rel="tag">API调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PoC/" rel="tag">PoC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QQ/" rel="tag">QQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wireshark/" rel="tag">Wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/curl/" rel="tag">curl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vsftpd/" rel="tag">vsftpd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%8E%E9%97%A8/" rel="tag">后门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag">命令行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90/" rel="tag">抓包分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AD%89%E4%BF%9D2-0/" rel="tag">等保2.0</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AD%89%E7%BA%A7%E4%BF%9D%E6%8A%A4/" rel="tag">等级保护</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" rel="tag">网络安全</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/API%E8%B0%83%E8%AF%95/" rel="tag">API调试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pikachu/" rel="tag">Pikachu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PoC/" rel="tag">PoC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/QQ/" rel="tag">QQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web%E6%BC%8F%E6%B4%9E/" rel="tag">Web漏洞</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Wireshark/" rel="tag">Wireshark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/curl/" rel="tag">curl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vsftpd/" rel="tag">vsftpd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%90%8E%E9%97%A8/" rel="tag">后门</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag">命令行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90/" rel="tag">抓包分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" rel="tag">渗透测试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="tag">漏洞复现</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AD%89%E4%BF%9D2-0/" rel="tag">等保2.0</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AD%89%E7%BA%A7%E4%BF%9D%E6%8A%A4/" rel="tag">等级保护</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" rel="tag">网络安全</a></li></ul>
     </div>
   </div>
 
@@ -601,7 +667,7 @@ except Exception:
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/API%E8%B0%83%E8%AF%95/" style="font-size: 10px;">API调试</a> <a href="/tags/PoC/" style="font-size: 10px;">PoC</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/QQ/" style="font-size: 10px;">QQ</a> <a href="/tags/Wireshark/" style="font-size: 10px;">Wireshark</a> <a href="/tags/curl/" style="font-size: 10px;">curl</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/%E5%90%8E%E9%97%A8/" style="font-size: 10px;">后门</a> <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" style="font-size: 10px;">命令行</a> <a href="/tags/%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90/" style="font-size: 10px;">抓包分析</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">漏洞复现</a> <a href="/tags/%E7%AD%89%E4%BF%9D2-0/" style="font-size: 10px;">等保2.0</a> <a href="/tags/%E7%AD%89%E7%BA%A7%E4%BF%9D%E6%8A%A4/" style="font-size: 10px;">等级保护</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" style="font-size: 10px;">网络安全</a>
+      <a href="/tags/API%E8%B0%83%E8%AF%95/" style="font-size: 10px;">API调试</a> <a href="/tags/Pikachu/" style="font-size: 10px;">Pikachu</a> <a href="/tags/PoC/" style="font-size: 10px;">PoC</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/QQ/" style="font-size: 10px;">QQ</a> <a href="/tags/Web%E6%BC%8F%E6%B4%9E/" style="font-size: 10px;">Web漏洞</a> <a href="/tags/Wireshark/" style="font-size: 10px;">Wireshark</a> <a href="/tags/curl/" style="font-size: 10px;">curl</a> <a href="/tags/vsftpd/" style="font-size: 10px;">vsftpd</a> <a href="/tags/%E5%90%8E%E9%97%A8/" style="font-size: 10px;">后门</a> <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" style="font-size: 10px;">命令行</a> <a href="/tags/%E6%8A%93%E5%8C%85%E5%88%86%E6%9E%90/" style="font-size: 10px;">抓包分析</a> <a href="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">渗透测试</a> <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" style="font-size: 10px;">漏洞复现</a> <a href="/tags/%E7%AD%89%E4%BF%9D2-0/" style="font-size: 10px;">等保2.0</a> <a href="/tags/%E7%AD%89%E7%BA%A7%E4%BF%9D%E6%8A%A4/" style="font-size: 10px;">等级保护</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" style="font-size: 10px;">网络安全</a>
     </div>
   </div>
 
@@ -631,15 +697,15 @@ except Exception:
           </li>
         
           <li>
+            <a href="/2026/11/02/pikachu%E9%9D%B6%E5%9C%BA%E6%90%AD%E5%BB%BA%E5%AE%9E%E9%AA%8C/">Pikachu靶场搭建实验</a>
+          </li>
+        
+          <li>
             <a href="/2026/10/19/Wireshark-qq-capture/">QQ流量分析：新版QQ图片传输是明文吗？——基于Wireshark的抓包实验</a>
           </li>
         
           <li>
             <a href="/2026/09/28/post%E5%AF%B9%E4%BA%8E%E7%AD%89%E4%BF%9D2-0%E7%9A%84%E7%90%86%E8%A7%A3%E4%BD%9C%E4%B8%9A/">对于等保2.0的理解</a>
-          </li>
-        
-          <li>
-            <a href="/2026/09/22/hello-world/">Hello World</a>
           </li>
         
       </ul>
